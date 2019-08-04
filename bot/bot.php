@@ -25,10 +25,12 @@ function conversation_command($data)
     	substr($data['text'], 0, 1),
 		 array('[')
 	)){
-		if (!in_array(
-			substr($data['text'], 0, 1),
-			array('/', '!')
-		)){ return true; } else { $num = 0; }
+		if(COMMAND_ACTIVE == true){
+			if (!in_array(
+				substr($data['text'], 0, 1),
+				array('/', '!')
+			)){ return true; } else { $num = 0; }
+		} else { return true; }
 	} else { $num = 1; }
 
 	$data['text'] = preg_replace('| +|', ' ', $data['text']);
@@ -45,10 +47,10 @@ function conversation_command($data)
 	   ),
 	 'original_command' => explode(" ", $message),
 	 'group_id' => $data['group_id'],
-	 'num' => 2
+	 'num' => $num + 1
 	];
 
-	switch($user['command'][1]){
+	switch($user['command'][$num]){
 
 		case 'пидор':
 			pidor($user, "https://pidor.men/lic.php?name=");
@@ -59,7 +61,7 @@ function conversation_command($data)
 		break;
 
 		default:
-			send($user, MSG_HELP);
+			send($user, $user['command'][1]."<br>".MSG_HELP);
 
 	}
 
@@ -104,6 +106,29 @@ function chat_command($data)
 	   
 }
 
+function commands($user){
+
+	switch($user['command'][0]){
+
+		case 'пидор':
+			pidor($user, "https://pidor.men/lic.php?name=");
+	 	break;
+
+		case 'пидорас':
+			pidor($user, "https://pidor.men/img.php?name=");
+	 	break;
+
+		case 'начать':
+		case 'start':
+			send($user, MSG_WELCOME);
+		break;
+
+		default:
+			send($user, MSG_HELP);
+
+	}
+
+}
 
 function send($user, $msg)
 {
